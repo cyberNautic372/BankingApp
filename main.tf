@@ -29,7 +29,7 @@ resource "aws_instance" "test_server" {
   # Allow all inbound traffic from anywhere if required
   count = var.allow_all_inbound ? 1 : 0
 
-  security_groups = var.allow_all_inbound ? [aws_security_group.allow-all-inbound.name] : []
+  security_groups = var.allow_all_inbound ? [aws_security_group.allow-all-inbound[count.index].name] : []
 }
 
 resource "aws_security_group" "allow-all-inbound" {
