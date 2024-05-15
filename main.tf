@@ -30,8 +30,6 @@ resource "aws_instance" "test_server" {
   count = var.allow_all_inbound ? 1 : 0
 
   security_groups = var.allow_all_inbound ? [aws_security_group.allow-all-inbound[count.index].name] : []
-
-  subnet_id = "subnet-0d96b34899d4e0b1f"  # Chosen subnet ID
 }
 
 resource "aws_security_group" "allow-all-inbound" {
@@ -61,4 +59,8 @@ resource "random_string" "random_suffix" {
   upper           = false
   numeric         = true  # Use `numeric` instead of `number`
   override_special = "_%@"
+}
+
+output "test_server_public_ip" {
+  value = aws_instance.test_server.*.public_ip
 }
