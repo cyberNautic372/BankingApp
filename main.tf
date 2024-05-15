@@ -18,12 +18,11 @@ resource "aws_instance" "test_server" {
 
   security_groups = var.allow_all_inbound ? [aws_security_group.default.name] : []
 
-  provisioner "remote-exec" {
-    connection {
-      type        = "ssh"
-      user        = "ubuntu"  # Adjust if the username is different
-      private_key = file("${path.module}/masterkey.pem")  # Reference the masterkey.pem file in the root directory
-    }
+  connection {
+    type        = "ssh"
+    user        = "ubuntu"  # Adjust if the username is different
+    private_key = file("${path.module}/masterkey.pem")  # Reference the masterkey.pem file in the root directory
+    host        = self.public_ip  # Use the public IP of the instance
   }
 }
 
