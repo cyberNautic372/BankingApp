@@ -1,26 +1,22 @@
 provider "aws" {
-  region = var.region  # Mumbai region
+  region = var.region
 }
 
 resource "aws_instance" "test_server" {
-  ami           = var.ami_id  # Replace with your desired AMI ID
+  ami           = var.ami_id
   instance_type = var.instance_type
-  key_name      = "masterkey"  # Use existing keypair
   tags = {
-    Name = var.instance_name  # Changed instance name to "test-server"
+    Name = var.instance_name
   }
 
-  # Allow all inbound traffic from anywhere
-  security_groups = ["allow-all-inbound"]
+  # Allow all inbound traffic from anywhere if required
+  count = var.allow_all_inbound ? 1 : 0
 
-  provisioner "remote-exec" {
-    inline = [
-      "sudo hostnamectl set-hostname testserver"
-    ]
-  }
+  security_groups = var.allow_all_inbound ? ["allow-all-inbound"] : []
 }
 
 resource "aws_security_group" "allow-all-inbound" {
+  count        = var.allow_all_inbound ? 1 : 0
   name        = "allow-all-inbound"
   description = "Allow all inbound traffic"
 
