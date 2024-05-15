@@ -1,6 +1,6 @@
 ---
 - name: Install net-tools on Test Server
-  hosts: test-servers
+  hosts: test_servers
   become: true
   remote_user: ubuntu   # Specify the SSH username to connect to the server
 
