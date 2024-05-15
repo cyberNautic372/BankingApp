@@ -3,14 +3,21 @@ provider "aws" {
 }
 
 resource "aws_instance" "test_server" {
-  ami           = var.ami_id
+  ami           = var.ami_id  # Replace with your desired AMI ID
   instance_type = var.instance_type
+  key_name      = "masterkey"  # Use existing keypair
   tags = {
-    Name = var.instance_name
+    Name = var.instance_name  # Changed instance name to "test-server"
   }
 
   # Allow all inbound traffic from anywhere
-  security_groups = var.allow_all_inbound ? ["allow-all-inbound"] : []
+  security_groups = ["allow-all-inbound"]
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo hostnamectl set-hostname testserver"
+    ]
+  }
 }
 
 resource "aws_security_group" "allow-all-inbound" {
