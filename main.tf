@@ -6,13 +6,20 @@ resource "aws_instance" "test_server" {
   ami           = var.ami_id
   instance_type = var.instance_type
   tags = {
-    Name = var.instance_name
+    Name = "test-server"
   }
 
   provisioner "remote-exec" {
     inline = [
       "sudo hostnamectl set-hostname testserver"
     ]
+
+    connection {
+      type        = "ssh"
+      user        = "ec2-user"  # Adjust if the username is different
+      private_key = file("${path.module}/masterkey.pem")  # Reference the masterkey.pem file in the root directory
+      host        = self.public_ip  # Use the public IP of the instance
+    }
   }
 
   # Allow all inbound traffic from anywhere if required
@@ -23,7 +30,7 @@ resource "aws_instance" "test_server" {
 
 resource "aws_security_group" "allow-all-inbound" {
   count        = var.allow_all_inbound ? 1 : 0
-  name        = "allow-all-inbound"
+  name        = "allow-all-inbound-${random_string.random_suffix.result}"
   description = "Allow all inbound traffic"
 
   ingress {
@@ -39,4 +46,13 @@ resource "aws_security_group" "allow-all-inbound" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]  # Allow traffic to anywhere
   }
+}
+
+resource "random_string" "random_suffix" {
+  count           = var.allow_all_inbound ? 1 : 0
+  length          = 6
+  special         = false
+  upper           = false
+  number          = true
+  override_special = "_%@"
 }
