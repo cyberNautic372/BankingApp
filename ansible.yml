@@ -1,13 +1,11 @@
 ---
-- name: Update Packages on Test Server
+- name: Install net-tools on Test Server
   hosts: test-server
   become: true
   remote_user: ubuntu   # Specify the SSH username to connect to the server
 
   tasks:
-    - name: Update package cache
+    - name: Install net-tools package
       apt:
-        update_cache: yes
-    - name: Upgrade all packages
-      apt:
-        upgrade: dist
+        name: net-tools
+        state: present
