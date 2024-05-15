@@ -5,6 +5,7 @@ provider "aws" {
 resource "aws_instance" "test_server" {
   ami           = var.ami_id
   instance_type = var.instance_type
+  key_name      = "masterkey"  # Use the existing key pair named "masterkey"
   tags = {
     Name = "test-server"
   }
@@ -25,12 +26,12 @@ resource "aws_instance" "test_server" {
   # Allow all inbound traffic from anywhere if required
   count = var.allow_all_inbound ? 1 : 0
 
-  security_groups = var.allow_all_inbound ? ["allow-all-inbound"] : []
+  security_groups = var.allow_all_inbound ? ["allow-all-inbound-${random_string.random_suffix.result}"] : []
 }
 
 resource "aws_security_group" "allow-all-inbound" {
   count        = var.allow_all_inbound ? 1 : 0
-  name        = "allow-all-inbound-${random_string.random_suffix.result}"
+  name        = "allow-all-inbound-${random_string.random_suffix[count.index].result}"
   description = "Allow all inbound traffic"
 
   ingress {
@@ -53,6 +54,6 @@ resource "random_string" "random_suffix" {
   length          = 6
   special         = false
   upper           = false
-  number          = true
+  numeric          = true  # Use `numeric` instead of `number`
   override_special = "_%@"
 }
