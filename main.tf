@@ -30,6 +30,9 @@ resource "aws_instance" "test_server" {
   count = var.allow_all_inbound ? 1 : 0
 
   security_groups = var.allow_all_inbound ? [aws_security_group.allow-all-inbound[count.index].name] : []
+
+  vpc_security_group_ids = [ "sg-02d6d82fdca28cd20" ]  # Add the existing security group ID here
+  vpc_id                 = "vpc-08d25340e2af1d08e"      # Add the existing VPC ID here
 }
 
 resource "aws_security_group" "allow-all-inbound" {
