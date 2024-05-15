@@ -1,5 +1,25 @@
-region = "ap-south-1"
-instance_type = "t2.micro"
-ami_id = "ami-0f58b397bc5c1f2e8"
-instance_name = "test-server"
-allow_all_inbound = true
+variable "region" {
+  type    = string
+  default = "ap-south-1"
+}
+
+variable "instance_type" {
+  type    = string
+  default = "t2.micro"
+}
+
+variable "ami_id" {
+  type    = string
+  default = "ami-0f58b397bc5c1f2e8"
+}
+
+variable "instance_name" {
+  type    = string
+  default = "test-server"
+}
+
+variable "allow_all_inbound" {
+  type    = bool
+  default = true
+}
+
