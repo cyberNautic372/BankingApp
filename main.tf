@@ -17,6 +17,14 @@ resource "aws_instance" "test_server" {
   count = var.allow_all_inbound ? 1 : 0
 
   security_groups = var.allow_all_inbound ? [aws_security_group.default.name] : []
+
+  provisioner "remote-exec" {
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"  # Adjust if the username is different
+      private_key = file("${path.module}/masterkey.pem")  # Reference the masterkey.pem file in the root directory
+    }
+  }
 }
 
 resource "aws_security_group" "default" {
@@ -39,5 +47,5 @@ resource "aws_security_group" "default" {
 }
 
 output "test_server_public_ip" {
-  value = aws_instance.test_server.public_ip
+  value = aws_instance.test_server[*].public_ip
 }
