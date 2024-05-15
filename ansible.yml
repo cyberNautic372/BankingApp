@@ -13,4 +13,4 @@
     command : sudo systemctl start docker
 
   - name: Deploy Docker Container
-    command: docker run -itd -p 9005:8082 prashant753/staragile_project1:latest
+    command: docker run -itd -p 9006:8082 prashant753/staragile_project1:latest
