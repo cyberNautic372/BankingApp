@@ -10,32 +10,18 @@ resource "aws_instance" "test_server" {
     Name = "test-server"
   }
 
-  provisioner "remote-exec" {
-    inline = [
-      "sudo hostnamectl set-hostname testserver"
-    ]
-
-    connection {
-      type        = "ssh"
-      user        = "ubuntu"  # Adjust if the username is different
-      private_key = file("${path.module}/masterkey.pem")  # Reference the masterkey.pem file in the root directory
-      host        = self.public_ip  # Use the public IP of the instance
-    }
-  }
-
   # Ensure the security group is created before referencing it
-  depends_on = [aws_security_group.allow-all-inbound]
+  depends_on = [aws_security_group.default]
 
   # Allow all inbound traffic from anywhere if required
   count = var.allow_all_inbound ? 1 : 0
 
-  security_groups = var.allow_all_inbound ? [aws_security_group.allow-all-inbound[count.index].name] : []
+  security_groups = var.allow_all_inbound ? [aws_security_group.default.name] : []
 }
 
-resource "aws_security_group" "allow-all-inbound" {
-  count        = var.allow_all_inbound ? 1 : 0
-  name        = "allow-all-inbound-${random_string.random_suffix[count.index].result}"
-  description = "Allow all inbound traffic"
+resource "aws_security_group" "default" {
+  name        = "default"
+  description = "Default security group"
 
   ingress {
     from_port   = 0
@@ -52,15 +38,6 @@ resource "aws_security_group" "allow-all-inbound" {
   }
 }
 
-resource "random_string" "random_suffix" {
-  count           = var.allow_all_inbound ? 1 : 0
-  length          = 6
-  special         = false
-  upper           = false
-  numeric         = true  # Use `numeric` instead of `number`
-  override_special = "_%@"
-}
-
 output "test_server_public_ip" {
-  value = aws_instance.test_server.*.public_ip
+  value = aws_instance.test_server.public_ip
 }
