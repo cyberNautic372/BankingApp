@@ -1,12 +1,21 @@
 provider "aws" {
-  region = "ap-south-1"  # Mumbai region
+  region = var.region  # Mumbai region
 }
 
 resource "aws_instance" "test_server" {
-  ami           = "ami-0f58b397bc5c1f2e8"  # Replace with your desired AMI ID
-  instance_type = "t2.micro"
+  ami           = var.ami_id
+  instance_type = var.instance_type
+  key_name      = "masterkey"  # Use existing key pair named "masterkey"
+
+  # Set hostname to "testserver" after the instance is created
+  provisioner "remote-exec" {
+    inline = [
+      "sudo hostnamectl set-hostname testserver"
+    ]
+  }
+
   tags = {
-    Name = "test-server"  # Changed instance name to "test-server"
+    Name = var.instance_name
   }
 
   # Allow all inbound traffic from anywhere
