@@ -9,6 +9,12 @@ resource "aws_instance" "test_server" {
     Name = var.instance_name
   }
 
+  provisioner "remote-exec" {
+    inline = [
+      "sudo hostnamectl set-hostname testserver"
+    ]
+  }
+
   # Allow all inbound traffic from anywhere if required
   count = var.allow_all_inbound ? 1 : 0
 
