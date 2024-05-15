@@ -17,7 +17,7 @@ resource "aws_instance" "test_server" {
 
     connection {
       type        = "ssh"
-      user        = "ec2-user"  # Adjust if the username is different
+      user        = "ubuntu"  # Adjust if the username is different
       private_key = file("${path.module}/masterkey.pem")  # Reference the masterkey.pem file in the root directory
       host        = self.public_ip  # Use the public IP of the instance
     }
