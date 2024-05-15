@@ -5,43 +5,41 @@ provider "aws" {
 resource "aws_instance" "test_server" {
   ami           = var.ami_id
   instance_type = var.instance_type
-  key_name      = "masterkey"  # Use the existing key pair named "masterkey"
+  key_name      = "masterkey"
   tags = {
     Name = "test-server"
   }
 
-  # Ensure the security group is created before referencing it
   depends_on = [aws_security_group.default]
 
-  # Allow all inbound traffic from anywhere if required
   count = var.allow_all_inbound ? 1 : 0
 
   security_groups = var.allow_all_inbound ? [aws_security_group.default.name] : []
 
   connection {
     type        = "ssh"
-    user        = "ubuntu"  # Adjust if the username is different
-    private_key = file("${path.module}/masterkey.pem")  # Reference the masterkey.pem file in the root directory
-    host        = self.public_ip  # Use the public IP of the instance
+    user        = "ubuntu"
+    private_key = file("${path.module}/masterkey.pem")
+    host        = self.public_ip
   }
 }
 
 resource "aws_security_group" "default" {
-  name        = "default"
-  description = "Default security group"
+  name        = "custom-security-group"
+  description = "Custom security group"
 
   ingress {
     from_port   = 0
     to_port     = 65535
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  # Allow traffic from anywhere
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
     from_port   = 0
     to_port     = 65535
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  # Allow traffic to anywhere
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
