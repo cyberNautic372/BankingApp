@@ -23,10 +23,13 @@ resource "aws_instance" "test_server" {
     }
   }
 
+  # Ensure the security group is created before referencing it
+  depends_on = [aws_security_group.allow-all-inbound]
+
   # Allow all inbound traffic from anywhere if required
   count = var.allow_all_inbound ? 1 : 0
 
-  security_groups = var.allow_all_inbound ? ["allow-all-inbound-${random_string.random_suffix[count.index].result}"] : []
+  security_groups = var.allow_all_inbound ? [aws_security_group.allow-all-inbound.name] : []
 }
 
 resource "aws_security_group" "allow-all-inbound" {
