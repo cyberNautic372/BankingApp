@@ -26,7 +26,7 @@ resource "aws_instance" "test_server" {
   # Allow all inbound traffic from anywhere if required
   count = var.allow_all_inbound ? 1 : 0
 
-  security_groups = var.allow_all_inbound ? ["allow-all-inbound-${random_string.random_suffix.result}"] : []
+  security_groups = var.allow_all_inbound ? ["allow-all-inbound-${random_string.random_suffix[count.index].result}"] : []
 }
 
 resource "aws_security_group" "allow-all-inbound" {
@@ -54,6 +54,6 @@ resource "random_string" "random_suffix" {
   length          = 6
   special         = false
   upper           = false
-  numeric          = true  # Use `numeric` instead of `number`
+  numeric         = true  # Use `numeric` instead of `number`
   override_special = "_%@"
 }
