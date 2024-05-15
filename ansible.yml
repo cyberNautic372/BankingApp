@@ -2,6 +2,7 @@
 - name: Update Packages on Test Server
   hosts: test-server
   become: true
+  remote_user: ubuntu   # Specify the SSH username to connect to the server
 
   tasks:
     - name: Update package cache
