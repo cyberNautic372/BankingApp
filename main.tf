@@ -2,6 +2,11 @@ provider "aws" {
   region = var.region
 }
 
+resource "random_string" "security_group_suffix" {
+  length  = 8  # Adjust the length as needed
+  special = false
+}
+
 resource "aws_instance" "test_server" {
   ami           = var.ami_id
   instance_type = var.instance_type
@@ -10,11 +15,9 @@ resource "aws_instance" "test_server" {
     Name = "test-server"
   }
 
-  depends_on = [aws_security_group.default]
+  count = 1  # Always create the instance
 
-  count = var.allow_all_inbound ? 1 : 0
-
-  security_groups = var.allow_all_inbound ? [aws_security_group.default.name] : []
+  security_groups = [aws_security_group.default.name]
 
   connection {
     type        = "ssh"
@@ -25,7 +28,7 @@ resource "aws_instance" "test_server" {
 }
 
 resource "aws_security_group" "default" {
-  name        = "custom-security-group"
+  name        = "custom-security-group-${random_string.security_group_suffix.result}"
   description = "Custom security group"
 
   ingress {
