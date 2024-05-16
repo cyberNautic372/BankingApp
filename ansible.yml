@@ -1,16 +1,42 @@
-- name : Configure Docker on EC2 Instances
-  hosts : all
+- name: Configure Docker on EC2 Instances
+  hosts: all
   become: true
-  connection : ssh
-  tasks : 
-  - name: updating apt
-    command : sudo apt-get update
+  connection: ssh
+  tasks:
+    - name: Updating apt
+      apt:
+        update_cache: yes
 
-  - name : Install Docker
-    command : sudo apt-get install -y docker.io
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
 
-  - name : Start Docker Service
-    command : sudo systemctl start docker
+    - name: Start Docker Service
+      service:
+        name: docker
+        state: started
+        enabled: yes
 
-  - name: Deploy Docker Container
-    command: docker run -itd -p 9006:8082 prashant753/staragile_project1:latest
+    - name: List running Docker containers
+      command: docker ps -q
+      register: running_containers
+      changed_when: false
+
+    - name: Stop running Docker containers
+      command: docker stop {{ item }}
+      loop: "{{ running_containers.stdout_lines }}"
+      when: running_containers.stdout != ''
+
+    - name: Remove stopped Docker containers
+      command: docker rm {{ item }}
+      loop: "{{ running_containers.stdout_lines }}"
+      when: running_containers.stdout != ''
+
+    # Uncomment the following task if you want to remove all Docker images
+    #- name: Remove all Docker images (optional, uncomment if needed)
+    #  command: docker rmi -f $(docker images -q)
+    #  when: running_containers.stdout != ''
+
+    - name: Deploy Docker Container
+      command: docker run -itd -p 9006:8082 prashant753/staragile_project1:latest
